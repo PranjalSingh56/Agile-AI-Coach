@@ -1,0 +1,41 @@
+feedback,sentiment
+"The sprint went really well, team collaboration was excellent and we delivered everything on time",positive
+"Communication could be better, some tasks were unclear but we managed",neutral
+"Too many blockers, sprint was a disaster and morale is low",negative
+"Great teamwork and velocity improved significantly this sprint",positive
+"Some delays but overall acceptable performance",neutral
+"Terrible sprint, too much pressure and poor planning led to failure",negative
+"Loved the retrospective, team feels motivated and energized",positive
+"Average sprint, nothing special, met most targets",neutral
+"Lots of bugs and rework, frustrating experience for the team",negative
+"Excellent sprint, best performance so far, everyone worked hard",positive
+"Mixed results, some stories done but several carried over",neutral
+"Very stressful sprint with unrealistic deadlines and poor support",negative
+"Team velocity improved, stakeholders are happy with our progress",positive
+"Okay sprint, not perfect but we learned a lot this time",neutral
+"Major issues with deployment, team struggled with technical debt",negative
+"Fantastic collaboration, all user stories completed successfully",positive
+"Sprint review went well, minor issues but mostly on track",neutral
+"Burnout is becoming a concern, workload was too high this sprint",negative
+"Outstanding sprint, exceeded velocity targets and customer loved demo",positive
+"Reasonable sprint with room for improvement in communication",neutral
+"Constant interruptions and scope creep ruined our sprint goals",negative
+"Team did an amazing job handling the complex requirements this sprint",positive
+"Sprint goals partially met, backlog refinement needs improvement",neutral
+"Poor sprint planning led to many incomplete tasks and confusion",negative
+"Morale is high, sprint went smoothly and product owner is pleased",positive
+"Some challenges but team adapted well to changing requirements",neutral
+"Too many meetings and not enough coding time, very unproductive",negative
+"Best sprint we have had in months, velocity jumped significantly",positive
+"Things were okay, a few stories missed but team tried hard",neutral
+"Deployment failures and critical bugs made this sprint very painful",negative
+"Brilliant sprint execution, zero carryover and great team spirit",positive
+"Mediocre sprint performance, nothing to celebrate or worry about",neutral
+"Team is exhausted and management is not listening to concerns",negative
+"Everyone collaborated beautifully, sprint review was a huge success",positive
+"Not our best sprint but we identified improvements for next time",neutral
+"Scope kept changing, impossible to focus and deliver quality work",negative
+"Really proud of what we achieved this sprint as a team",positive
+"Sprint was average, velocity stable but no major improvements",neutral
+"Technical issues and communication gaps hurt our sprint badly",negative
+"Incredible sprint, shipped major feature on time under budget",positive

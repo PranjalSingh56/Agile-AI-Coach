@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediction — AI Agile Coach</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <a href="/dashboard" class="logo">
+      <div class="logo-icon">🤖</div>
+      <div class="logo-text">AI Agile Coach<span>ML POWERED</span></div>
+    </a>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-badge">
+      <div class="user-avatar">{{ user[0]|upper }}</div>
+      <div class="user-info">
+        <div class="name">{{ user }}</div>
+        <div class="role">{{ role }}</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="/dashboard" class="nav-link-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <div class="nav-section-label" style="margin-top:8px;">ML Features</div>
+    <a href="/prediction" class="nav-link-item active"><span class="nav-icon">🔮</span> Sprint Prediction</a>
+    <a href="/risk" class="nav-link-item"><span class="nav-icon">⚠️</span> Risk Analysis</a>
+    <a href="/standup" class="nav-link-item"><span class="nav-icon">📝</span> Standup Summary</a>
+    <a href="/sentiment" class="nav-link-item"><span class="nav-icon">😊</span> Sentiment Analysis</a>
+    <div class="nav-section-label" style="margin-top:8px;">Reports</div>
+    <a href="/charts" class="nav-link-item"><span class="nav-icon">📈</span> Charts & Reports</a>
+  </nav>
+  <div class="sidebar-footer"><a href="/logout" class="logout-btn">🚪 Logout</a></div>
+</aside>
+
+<main class="main-content">
+  <div class="page-header fade-up">
+    <h1 class="page-title">ML Predictions</h1>
+    <p class="page-subtitle">Logistic Regression · Random Forest · Scikit-learn</p>
+  </div>
+
+  <div class="page-body">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+      <!-- ═══════════════════════════════════════════════
+           SECTION 1: Sprint Success Prediction
+           Model: Logistic Regression
+      ═══════════════════════════════════════════════ -->
+      <div class="fade-up-2">
+        <div class="card-dark" style="height:100%">
+          <div class="card-title">🔮 Sprint Success Prediction</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+            <span class="badge-teal">Logistic Regression</span>
+            <span class="badge-purple">Binary Classification</span>
+          </div>
+          <p class="text-muted" style="font-size:13px;margin-bottom:20px;">
+            Enter current sprint metrics. The ML model will predict whether your sprint will
+            <strong class="text-green">succeed</strong> or <strong class="text-red">fail</strong>.
+          </p>
+
+          {% if error %}
+          <div class="result-card danger" style="margin-bottom:16px;">
+            <p class="text-red mono">{{ error }}</p>
+          </div>
+          {% endif %}
+
+          <form method="POST" action="/prediction">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+              <div>
+                <label class="form-label">Team Velocity</label>
+                <input type="number" name="team_velocity" class="form-control"
+                       placeholder="e.g. 45" min="0" max="100"
+                       value="{{ request.form.get('team_velocity', '') }}" required>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Story points / sprint</p>
+              </div>
+
+              <div>
+                <label class="form-label">Completed Tasks</label>
+                <input type="number" name="completed_tasks" class="form-control"
+                       placeholder="e.g. 30" min="0"
+                       value="{{ request.form.get('completed_tasks', '') }}" required>
+              </div>
+
+              <div>
+                <label class="form-label">Pending Tasks</label>
+                <input type="number" name="pending_tasks" class="form-control"
+                       placeholder="e.g. 5" min="0"
+                       value="{{ request.form.get('pending_tasks', '') }}" required>
+              </div>
+
+              <div>
+                <label class="form-label">Bug Count</label>
+                <input type="number" name="bugs_count" class="form-control"
+                       placeholder="e.g. 2" min="0"
+                       value="{{ request.form.get('bugs_count', '') }}" required>
+              </div>
+
+              <div style="grid-column:span 2">
+                <label class="form-label">Team Capacity %</label>
+                <input type="number" name="team_capacity" class="form-control"
+                       placeholder="e.g. 80" min="0" max="100"
+                       value="{{ request.form.get('team_capacity', '') }}" required>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">0–100 % availability</p>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-teal" style="width:100%;margin-top:20px;">
+              🔮 Predict Sprint Outcome
+            </button>
+          </form>
+
+          <!-- Result -->
+          {% if result %}
+          <div class="result-card {{ result.success_class }} fade-up" style="margin-top:20px;">
+            <div class="result-label">Sprint Prediction</div>
+            <div class="result-value {% if result.success_class == 'success' %}text-green{% else %}text-red{% endif %}">
+              {{ result.prediction }}
+            </div>
+            <div style="margin-top:10px;">
+              <span class="badge-teal">Confidence: {{ result.confidence }}</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+              <div>
+                <div class="mono text-muted" style="font-size:10px;letter-spacing:1px;">SUCCESS PROBABILITY</div>
+                <div class="mono text-green" style="font-size:18px;font-weight:700;">{{ result.success_prob }}</div>
+              </div>
+              <div>
+                <div class="mono text-muted" style="font-size:10px;letter-spacing:1px;">FAILURE PROBABILITY</div>
+                <div class="mono text-red" style="font-size:18px;font-weight:700;">{{ result.failure_prob }}</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="card-title">Input Summary</div>
+            <table class="table-dark-custom">
+              {% for k, v in result.inputs.items() %}
+              <tr>
+                <td class="mono text-muted" style="font-size:12px;">{{ k }}</td>
+                <td class="mono text-teal" style="text-align:right;font-size:13px;">{{ v }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════
+           SECTION 2: Task Priority Prediction
+           Model: Random Forest (JS/API call)
+      ═══════════════════════════════════════════════ -->
+      <div class="fade-up-3" id="task">
+        <div class="card-dark" style="height:100%">
+          <div class="card-title">🎯 Task Priority Prediction</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+            <span class="badge-teal">Random Forest</span>
+            <span class="badge-amber">Multi-Class</span>
+          </div>
+          <p class="text-muted" style="font-size:13px;margin-bottom:20px;">
+            Enter task details. The model predicts priority:
+            <span class="text-red">High</span> /
+            <span class="text-amber">Medium</span> /
+            <span class="text-green">Low</span>.
+          </p>
+
+          <div style="display:grid;gap:14px;">
+
+            <div>
+              <label class="form-label">Complexity (1-10)</label>
+              <input type="range" id="complexity" min="1" max="10" value="5"
+                     class="form-control" style="padding:6px"
+                     oninput="document.getElementById('comp-val').textContent=this.value">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:2px;">
+                <span>Simple</span>
+                <span class="text-teal mono" id="comp-val">5</span>
+                <span>Complex</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label">Deadline (Days Remaining)</label>
+              <input type="number" id="deadline_days" class="form-control"
+                     placeholder="e.g. 7" min="1" max="60">
+            </div>
+
+            <div>
+              <label class="form-label">Business Value (1-10)</label>
+              <input type="range" id="business_value" min="1" max="10" value="5"
+                     class="form-control" style="padding:6px"
+                     oninput="document.getElementById('bv-val').textContent=this.value">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:2px;">
+                <span>Low value</span>
+                <span class="text-teal mono" id="bv-val">5</span>
+                <span>High value</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label">Dependencies Count</label>
+              <input type="number" id="dependencies" class="form-control"
+                     placeholder="e.g. 2" min="0" max="10">
+            </div>
+          </div>
+
+          <button id="predict-task-btn" class="btn-teal" style="width:100%;margin-top:20px;"
+                  onclick="predictTaskPriority()">
+            🎯 Predict Priority
+          </button>
+
+          <div id="task-result"></div>
+
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- ML Info box -->
+    <div class="card-dark fade-up-4" style="margin-top:24px;">
+      <div class="card-title">🧠 How These ML Models Work</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:13px;color:var(--text-muted);">
+        <div>
+          <strong class="text-teal">Logistic Regression (Sprint Prediction)</strong>
+          <p style="margin-top:6px;line-height:1.6;">
+            Learns a mathematical boundary between "success" and "failure" sprint patterns.
+            Outputs a probability score between 0–1. Easy to interpret and explain.
+            Trained on 50 synthetic sprint records with features: velocity, tasks, bugs, capacity.
+          </p>
+        </div>
+        <div>
+          <strong class="text-teal">Random Forest (Task Priority)</strong>
+          <p style="margin-top:6px;line-height:1.6;">
+            Builds 100 decision trees, each trained on random subsets of data.
+            Final prediction is the majority vote. Handles non-linear patterns well.
+            Features: complexity, deadline, business value, dependencies.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

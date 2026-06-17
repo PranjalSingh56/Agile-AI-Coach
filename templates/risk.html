@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Analysis — AI Agile Coach</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <a href="/dashboard" class="logo">
+      <div class="logo-icon">🤖</div>
+      <div class="logo-text">AI Agile Coach<span>ML POWERED</span></div>
+    </a>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-badge">
+      <div class="user-avatar">{{ user[0]|upper }}</div>
+      <div class="user-info"><div class="name">{{ user }}</div><div class="role">{{ role }}</div></div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="/dashboard" class="nav-link-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <div class="nav-section-label" style="margin-top:8px;">ML Features</div>
+    <a href="/prediction" class="nav-link-item"><span class="nav-icon">🔮</span> Sprint Prediction</a>
+    <a href="/risk" class="nav-link-item active"><span class="nav-icon">⚠️</span> Risk Analysis</a>
+    <a href="/standup" class="nav-link-item"><span class="nav-icon">📝</span> Standup Summary</a>
+    <a href="/sentiment" class="nav-link-item"><span class="nav-icon">😊</span> Sentiment Analysis</a>
+    <div class="nav-section-label" style="margin-top:8px;">Reports</div>
+    <a href="/charts" class="nav-link-item"><span class="nav-icon">📈</span> Charts & Reports</a>
+  </nav>
+  <div class="sidebar-footer"><a href="/logout" class="logout-btn">🚪 Logout</a></div>
+</aside>
+
+<main class="main-content">
+  <div class="page-header fade-up">
+    <h1 class="page-title">Agile Risk Analysis</h1>
+    <p class="page-subtitle">Rule-based AI · Pattern matching · Automated warnings</p>
+  </div>
+
+  <div class="page-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+      <!-- Input Form -->
+      <div class="fade-up-2">
+        <div class="card-dark">
+          <div class="card-title">⚙️ Sprint Parameters</div>
+          <p class="text-muted" style="font-size:13px;margin-bottom:20px;">
+            Enter your current sprint metrics. The AI engine will apply
+            <strong class="text-teal">6 risk detection rules</strong> and generate actionable warnings.
+          </p>
+
+          <form method="POST" action="/risk">
+
+            <div style="margin-bottom:16px;">
+              <label class="form-label">Delayed Tasks</label>
+              <input type="number" name="delayed_tasks" class="form-control"
+                     placeholder="e.g. 3" min="0"
+                     value="{{ request.form.get('delayed_tasks', '') }}" required>
+              <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Tasks past their due date</p>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label class="form-label">Sprint Story Points</label>
+              <input type="number" name="sprint_load" class="form-control"
+                     placeholder="e.g. 35" min="0"
+                     value="{{ request.form.get('sprint_load', '') }}" required>
+              <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Total story points committed</p>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label class="form-label">Open Bug Count</label>
+              <input type="number" name="bugs_count" class="form-control"
+                     placeholder="e.g. 6" min="0"
+                     value="{{ request.form.get('bugs_count', '') }}" required>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label class="form-label">Current Team Velocity</label>
+              <input type="number" name="team_velocity" class="form-control"
+                     placeholder="e.g. 42" min="0"
+                     value="{{ request.form.get('team_velocity', '') }}" required>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label class="form-label">Capacity Used (%)</label>
+              <input type="number" name="capacity_used" class="form-control"
+                     placeholder="e.g. 85" min="0" max="100"
+                     value="{{ request.form.get('capacity_used', '') }}" required>
+            </div>
+
+            <div style="margin-bottom:20px;">
+              <label class="form-label">Days Remaining in Sprint</label>
+              <input type="number" name="days_remaining" class="form-control"
+                     placeholder="e.g. 3" min="0" max="30"
+                     value="{{ request.form.get('days_remaining', '') }}" required>
+            </div>
+
+            <button type="submit" class="btn-teal" style="width:100%;">
+              🔍 Detect Risks
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="fade-up-3">
+        <div class="card-dark" style="height:100%">
+          <div class="card-title">🚨 Risk Detection Results</div>
+
+          {% if not submitted %}
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:var(--text-muted);text-align:center;">
+              <div style="font-size:48px;margin-bottom:16px;">🛡️</div>
+              <p>Fill in sprint parameters and click<br><strong class="text-teal">Detect Risks</strong> to run analysis</p>
+            </div>
+
+          {% else %}
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;font-family:var(--font-mono);">
+              {{ risks|length }} risk(s) identified
+            </p>
+
+            {% for risk in risks %}
+            <div class="risk-card {{ risk.color }}">
+              <div class="risk-icon">{{ risk.icon }}</div>
+              <div style="flex:1">
+                <div class="risk-title">
+                  <span class="badge-{{ risk.color if risk.color != 'info' else 'teal' }}" style="margin-right:8px;font-size:9px;">{{ risk.level }}</span>
+                  {{ risk.title }}
+                </div>
+                <div class="risk-msg">{{ risk.message }}</div>
+                <div class="risk-action">💡 {{ risk.action }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- Rule documentation -->
+    <div class="card-dark fade-up-4" style="margin-top:24px;">
+      <div class="card-title">📋 AI Risk Detection Rules</div>
+      <table class="table-dark-custom">
+        <thead>
+          <tr>
+            <th>Rule</th>
+            <th>Condition</th>
+            <th>Risk Level</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Delayed Tasks</td>
+            <td class="text-muted">&gt; 5 delayed</td>
+            <td><span class="badge-red">HIGH</span></td>
+            <td>Schedule</td>
+          </tr>
+          <tr>
+            <td class="mono">Delayed Tasks</td>
+            <td class="text-muted">&gt; 2 delayed</td>
+            <td><span class="badge-amber">MEDIUM</span></td>
+            <td>Schedule</td>
+          </tr>
+          <tr>
+            <td class="mono">Sprint Load</td>
+            <td class="text-muted">&gt; 40 story points</td>
+            <td><span class="badge-red">HIGH</span></td>
+            <td>Capacity</td>
+          </tr>
+          <tr>
+            <td class="mono">Bug Count</td>
+            <td class="text-muted">&gt; 10 open bugs</td>
+            <td><span class="badge-red">HIGH</span></td>
+            <td>Quality</td>
+          </tr>
+          <tr>
+            <td class="mono">Team Velocity</td>
+            <td class="text-muted">&lt; 20 points</td>
+            <td><span class="badge-red">HIGH</span></td>
+            <td>Performance</td>
+          </tr>
+          <tr>
+            <td class="mono">Capacity Used</td>
+            <td class="text-muted">&gt; 90%</td>
+            <td><span class="badge-red">HIGH</span></td>
+            <td>Capacity</td>
+          </tr>
+          <tr>
+            <td class="mono">Deadline Pressure</td>
+            <td class="text-muted">≤ 2 days left + delayed tasks</td>
+            <td><span class="badge-red">HIGH</span></td>
+            <td>Schedule</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /page-body -->
+</main>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
