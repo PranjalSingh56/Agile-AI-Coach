@@ -1,6 +1,6 @@
 # 🤖 AI-Powered Agile Coaching System
 
-> Final Year Project | Machine Learning + Flask | Scrum Masters & Product Owners
+> MTECH Project | Machine Learning + Flask | Scrum Masters & Product Owners
 
 ---
 
@@ -197,11 +197,11 @@ http://127.0.0.1:5000
 
 ## 👨‍💻 Author
 
-Final Year Project — AI/ML  
+MTECH first Year Project — AI/ML  
 Tech Stack: Python · Flask · Scikit-learn · TextBlob · Chart.js
 
 ---
 
 ## 📄 License
 
-This project is created for educational purposes as part of a Final Year Project.
+This project is created for educational purposes.
